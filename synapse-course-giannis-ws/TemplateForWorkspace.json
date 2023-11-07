@@ -272,6 +272,52 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/8_explore_trip_data_parquet')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/discovery"
+				},
+				"content": {
+					"query": "USE nyc_taxi_discovery;\n\n-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synapsecoursegiannisdl.dfs.core.windows.net/nyc-taxi-data/raw/trip_data_green_parquet/year=2020/month=01/part-00000-tid-6133789922049958496-2e489315-890a-4453-ae93-a104be9a6f06-106-1-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n\n-- Identify the interred data types\nEXEC sp_describe_first_result_set N'SELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK ''https://synapsecoursegiannisdl.dfs.core.windows.net/nyc-taxi-data/raw/trip_data_green_parquet/year=2020/month=01/part-00000-tid-6133789922049958496-2e489315-890a-4453-ae93-a104be9a6f06-106-1-c000.snappy.parquet'',\n        FORMAT = ''PARQUET''\n    ) AS [result]'\n\n-- Define Columns and data types\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        FORMAT = 'PARQUET',\n        DATA_SOURCE = 'nyc_taxi_data_raw'\n    ) \n    WITH(\n        VendorID INT,\n        lpep_pickup_datetime datetime2(7),\n        lpep_dropoff_datetime DATETIME2(7),\n        store_and_fwd_flag CHAR(1),\n        RatecodeID INT,\n        PULocationID INT,\n        DOLocationID INT,\n        passenger_count INT,\n        trip_distance FLOAT,\n        fare_amount FLOAT,\n        extra FLOAT,\n        mta_tax FLOAT,\n        tip_amount FLOAT,\n        tolls_amount FLOAT,\n        ehail_fee INT, \n        improvement_surcharge FLOAT,\n        total_amount FLOAT,\n        payment_type INT,\n        trip_type INT,\n        congestion_surcharge FLOAT\n    )AS [result]\n\n-- USE Wildcard characters \nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2021/month=*.parquet/',\n        FORMAT = 'PARQUET',\n        DATA_SOURCE = 'nyc_taxi_data_raw'\n        )AS [result]\n\n-- Use filename function \n\nSELECT\n    result.filename() AS file_name,\n    result.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2021/month=*/',\n        FORMAT = 'PARQUET',\n        DATA_SOURCE = 'nyc_taxi_data_raw'\n        )AS [result];\n\n\n-- Query from subfolders \n\nSELECT\n    TOP 100\n    result.filepath() AS file_path,\n    result.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/**',\n        FORMAT = 'PARQUET',\n        DATA_SOURCE = 'nyc_taxi_data_raw'\n    ) AS [result]\n\n\n-- Use filepath to target certain partition \n\n\nSELECT \n    result.filepath(1) AS year,\n    result.filepath(2) AS month,\n    COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=*/month=*/*.parquet',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS [result]\nWHERE result.filepath(1) = '2020'\n    AND result.filepath(2) IN ('06','07','08')\nGROUP BY result.filepath(1),result.filepath(2)\nORDER BY result.filepath(1),result.filepath(2);",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "nyc_taxi_discovery",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/9_explore_trip_data_green_delta')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/discovery"
+				},
+				"content": {
+					"query": "USE nyc_taxi_discovery;\n\nSELECT TOP 100\n*\nFROM OPENROWSET(\n    BULK 'trip_data_green_delta/',\n    DATA_SOURCE = 'nyc_taxi_data_raw',\n    FORMAT = 'DELTA'\n    )AS trip_data;\n\n-- Cant query inside a folder that has no delta folder , because it just makes it a normal folder format\n\nSELECT TOP 100\n*\nFROM OPENROWSET(\n    BULK 'trip_data_green_delta/year=2020',\n    DATA_SOURCE = 'nyc_taxi_data_raw',\n    FORMAT = 'DELTA'\n    )AS trip_data;\n\n\n-- Exec for column description\nEXEC sp_describe_first_result_set N'SELECT TOP 100\n*\nFROM OPENROWSET(\n    BULK ''trip_data_green_delta/'',\n    DATA_SOURCE = ''nyc_taxi_data_raw'',\n    FORMAT = ''DELTA''\n    )AS trip_data'\n\n-- Above data seems legit except varchar which is 8000 so we include the types with a 'with' clause\n\nSELECT TOP 100\n*\nFROM OPENROWSET(\n    BULK 'trip_data_green_delta/',\n    DATA_SOURCE = 'nyc_taxi_data_raw',\n    FORMAT = 'DELTA'\n    )\n    WITH(\n        VendorID INT,\n        lpep_pickup_datetime datetime2(7),\n        lpep_dropoff_datetime DATETIME2(7),\n        store_and_fwd_flag CHAR(1),\n        RatecodeID INT,\n        PULocationID INT,\n        DOLocationID INT,\n        passenger_count INT,\n        trip_distance FLOAT,\n        fare_amount FLOAT,\n        extra FLOAT,\n        mta_tax FLOAT,\n        tip_amount FLOAT,\n        tolls_amount FLOAT,\n        ehail_fee INT, \n        improvement_surcharge FLOAT,\n        total_amount FLOAT,\n        payment_type INT,\n        trip_type INT,\n        congestion_surcharge FLOAT\n    )\n    AS trip_data;\n\n-- Reduce columns for better performance\n-- need to add the columns we partitioned year-month\n\nSELECT TOP 100\n*\nFROM OPENROWSET(\n    BULK 'trip_data_green_delta/',\n    DATA_SOURCE = 'nyc_taxi_data_raw',\n    FORMAT = 'DELTA'\n    )\n    WITH(\n        tip_amount FLOAT,\n        trip_type INT,\n        year VARCHAR(4),\n        month VARCHAR(2)\n    )\n    AS trip_data;\n\n\nSELECT COUNT(DISTINCT payment_type)\nFROM OPENROWSET(\n    BULK 'trip_data_green_delta/',\n    DATA_SOURCE = 'nyc_taxi_data_raw',\n    FORMAT = 'DELTA'\n    )\n    AS trip_data;\n\n-- Increase performance - reduce processed data scanned\n\nSELECT COUNT(DISTINCT payment_type)\nFROM OPENROWSET(\n    BULK 'trip_data_green_delta/',\n    DATA_SOURCE = 'nyc_taxi_data_raw',\n    FORMAT = 'DELTA'\n    )\n    AS trip_data\nWHERE year = '2020' AND month = '01';",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "nyc_taxi_discovery",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Query Parquet files')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -309,29 +355,6 @@
 					},
 					"currentConnection": {
 						"databaseName": "master",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "nyc_taxi/discovery"
-				},
-				"content": {
-					"query": "USE nyc_taxi_discovery;\n\n-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synapsecoursegiannisdl.dfs.core.windows.net/nyc-taxi-data/raw/trip_data_green_parquet/year=2020/month=01/part-00000-tid-6133789922049958496-2e489315-890a-4453-ae93-a104be9a6f06-106-1-c000.snappy.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n\n\n-- Identify the interred data types\nEXEC sp_describe_first_result_set N'SELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK ''https://synapsecoursegiannisdl.dfs.core.windows.net/nyc-taxi-data/raw/trip_data_green_parquet/year=2020/month=01/part-00000-tid-6133789922049958496-2e489315-890a-4453-ae93-a104be9a6f06-106-1-c000.snappy.parquet'',\n        FORMAT = ''PARQUET''\n    ) AS [result]'\n\n-- Define Columns and data types\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        FORMAT = 'PARQUET',\n        DATA_SOURCE = 'nyc_taxi_data_raw'\n    ) \n    WITH(\n        VendorID INT,\n        lpep_pickup_datetime datetime2(7),\n        lpep_dropoff_datetime DATETIME2(7),\n        store_and_fwd_flag CHAR(1),\n        RatecodeID INT,\n        PULocationID INT,\n        DOLocationID INT,\n        passenger_count INT,\n        trip_distance FLOAT,\n        fare_amount FLOAT,\n        extra FLOAT,\n        mta_tax FLOAT,\n        tip_amount FLOAT,\n        tolls_amount FLOAT,\n        ehail_fee INT, \n        improvement_surcharge FLOAT,\n        total_amount FLOAT,\n        payment_type INT,\n        trip_type INT,\n        congestion_surcharge FLOAT\n    )AS [result]",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "nyc_taxi_discovery",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
