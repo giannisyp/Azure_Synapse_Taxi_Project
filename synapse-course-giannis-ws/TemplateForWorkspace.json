@@ -226,6 +226,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/1_create_databases')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/ldw"
+				},
+				"content": {
+					"query": "USE master\nGO\n\nCREATE DATABASE nyc_taxi_ldw --logical data warehouse\nGO\n\nALTER DATABASE nyc_taxi_ldw COLLATE Latin1_General_100_BIN2_UTF8\nGO\n\nUSE nyc_taxi_ldw\nGO\n\nCREATE SCHEMA bronze\nGO \n\nCREATE SCHEMA silver\nGO \n\nCREATE SCHEMA gold\nGO \n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "nyc_taxi_ldw",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/1_explore_taxi_zone')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -240,6 +263,29 @@
 					},
 					"currentConnection": {
 						"databaseName": "nyc_taxi_discovery",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/2_create_external_data_sources')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/ldw"
+				},
+				"content": {
+					"query": "USE nyc_taxi_ldw;\n\nCREATE EXTERNAL DATA SOURCE nyc_taxi_src WITH (\n    LOCATION = 'https://synapsecoursegiannisdl.dfs.core.windows.net/nyc-taxi-data'\n);",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "nyc_taxi_ldw",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
@@ -272,6 +318,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/3_create_external_file_formats')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/ldw"
+				},
+				"content": {
+					"query": "USE nyc_taxi_ldw;\n\nCREATE EXTERNAL FILE FORMAT csv_file_format\nWITH (\n        FORMAT_TYPE = DELIMITEDTEXT,\n        FORMAT_OPTIONS ( \n              FIELD_TERMINATOR = ',' ,\n              STRING_DELIMITER = '\"' ,\n              FIRST_ROW = 2 ,\n              USE_TYPE_DEFAULT = FALSE ,\n              ENCODING = 'UTF8' ,\n              PARSER_VERSION = '2.0' )\n    );\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "nyc_taxi_ldw",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/3_explore_vendor')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -286,6 +355,29 @@
 					},
 					"currentConnection": {
 						"databaseName": "nyc_taxi_discovery",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/4_create_bronze_tables')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/ldw"
+				},
+				"content": {
+					"query": "USE nyc_taxi_ldw;\n\n-- Create a new external table for taxi_zone\nCREATE EXTERNAL TABLE bronze.taxi_zone\n    (   location_id SMALLINT ,\n        borough VARCHAR(15) ,\n        zone VARCHAR(50) ,\n        service_zone VARCHAR(15) )\n    WITH (\n        LOCATION = 'raw/taxi_zone.csv',\n        DATA_SOURCE = nyc_taxi_src,\n        FILE_FORMAT = csv_file_format \n       );\n\n\nSELECT * FROM bronze.taxi_zone;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "nyc_taxi_ldw",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
