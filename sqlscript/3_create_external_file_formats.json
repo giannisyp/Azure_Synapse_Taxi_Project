@@ -5,7 +5,7 @@
 			"name": "nyc_taxi/ldw"
 		},
 		"content": {
-			"query": "USE nyc_taxi_ldw;\n\nCREATE EXTERNAL FILE FORMAT csv_file_format\nWITH (\n        FORMAT_TYPE = DELIMITEDTEXT,\n        FORMAT_OPTIONS ( \n              FIELD_TERMINATOR = ',' ,\n              STRING_DELIMITER = '\"' ,\n              FIRST_ROW = 2 ,\n              USE_TYPE_DEFAULT = FALSE ,\n              ENCODING = 'UTF8' ,\n              PARSER_VERSION = '2.0' )\n    );\n",
+			"query": "USE nyc_taxi_ldw;\n\n-- Make code rerunable by using if statement to check if file exists\n\nIF NOT EXISTS(SELECT * FROM sys.external_file_formats WHERE name ='csv_file_format')\n      CREATE EXTERNAL FILE FORMAT csv_file_format\n      WITH (\n            FORMAT_TYPE = DELIMITEDTEXT,\n            FORMAT_OPTIONS ( \n                  FIELD_TERMINATOR = ',' ,\n                  STRING_DELIMITER = '\"' ,\n                  FIRST_ROW = 2 ,\n                  USE_TYPE_DEFAULT = FALSE ,\n                  ENCODING = 'UTF8' ,\n                  PARSER_VERSION = '2.0' )\n      );\n\n-- Use parser version1 \n\nIF NOT EXISTS(SELECT * FROM sys.external_file_formats WHERE name ='csv_file_format_pv1')\n      CREATE EXTERNAL FILE FORMAT csv_file_format_pv1\n      WITH (\n            FORMAT_TYPE = DELIMITEDTEXT,\n            FORMAT_OPTIONS ( \n                  FIELD_TERMINATOR = ',' ,\n                  STRING_DELIMITER = '\"' ,\n                  FIRST_ROW = 2 ,\n                  USE_TYPE_DEFAULT = FALSE ,\n                  ENCODING = 'UTF8' ,\n                  PARSER_VERSION = '1.0' )\n      );",
 			"metadata": {
 				"language": "sql"
 			},
