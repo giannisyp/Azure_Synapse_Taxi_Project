@@ -13,6 +13,9 @@
 		},
 		"synapse-course-giannis-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://synapsecoursegiannisdl.dfs.core.windows.net"
+		},
+		"ls_synapsecoursegiannisdl_properties_typeProperties_url": {
+			"value": "https://synapsecoursegiannisdl.dfs.core.windows.net/"
 		}
 	}
 }
