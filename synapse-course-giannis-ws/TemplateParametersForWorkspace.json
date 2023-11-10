@@ -11,11 +11,11 @@
 		"bing-covid-19-data_sasUri": {
 			"value": ""
 		},
-		"synapse-course-giannis-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
-			"value": "https://synapsecoursegiannisdl.dfs.core.windows.net"
-		},
 		"ls_synapsecoursegiannisdl_properties_typeProperties_url": {
 			"value": "https://synapsecoursegiannisdl.dfs.core.windows.net/"
+		},
+		"synapse-course-giannis-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://synapsecoursegiannisdl.dfs.core.windows.net"
 		}
 	}
 }
