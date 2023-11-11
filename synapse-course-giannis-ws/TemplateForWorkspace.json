@@ -410,6 +410,9 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"folder": {
+					"name": "demo"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -479,6 +482,9 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "demo"
 				},
 				"annotations": []
 			},
@@ -708,6 +714,9 @@
 				"linkedServiceName": {
 					"referenceName": "ls_synapsecoursegiannisdl",
 					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "demo"
 				},
 				"annotations": [],
 				"type": "Parquet",
@@ -1765,6 +1774,18 @@
 					"resultLimit": 5000
 				},
 				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/pl_execute_all_pipelines')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
 			},
 			"dependsOn": []
 		}
