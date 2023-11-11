@@ -224,6 +224,53 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/pl_create_gold_trip_data_green_agg')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Create Gold Trip Data Green Agg",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "1_spark_create_gold_trip_data_green_agg",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "coursepool",
+								"type": "BigDataPoolReference"
+							},
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"numExecutors": null
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/notebooks/1_spark_create_gold_trip_data_green_agg')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/coursepool')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/pl_create_silver_tables')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -1911,7 +1958,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "d84c2aed-9a01-4c13-8dff-8817fd8f824a"
+						"spark.autotune.trackingId": "80297bac-e10f-4670-96c3-3648cbeede56"
 					}
 				},
 				"metadata": {
@@ -1986,12 +2033,12 @@
 						},
 						"source": [
 							"#Set the folder paths so that it can be used later. \n",
-							"bronze_folder_path = 'abfss://nyc-taxi-data@synapsecoursedl.dfs.core.windows.net/raw'\n",
-							"silver_folder_path = 'abfss://nyc-taxi-data@synapsecoursedl.dfs.core.windows.net/silver'\n",
-							"gold_folder_path = 'abfss://nyc-taxi-data@synapsecoursedl.dfs.core.windows.net/gold'"
+							"bronze_folder_path = 'abfss://nyc-taxi-data@synapsecoursegiannisdl.dfs.core.windows.net/raw'\n",
+							"silver_folder_path = 'abfss://nyc-taxi-data@synapsecoursegiannisdl.dfs.core.windows.net/silver'\n",
+							"gold_folder_path = 'abfss://nyc-taxi-data@synapsecoursegiannisdl.dfs.core.windows.net/gold'"
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 13
 					},
 					{
 						"cell_type": "code",
@@ -2011,7 +2058,7 @@
 							"spark.conf.set(\"spark.sql.sources.partitionColumnTypeInference.enabled\", \"false\")"
 						],
 						"outputs": [],
-						"execution_count": 3
+						"execution_count": 8
 					},
 					{
 						"cell_type": "code",
@@ -2039,7 +2086,7 @@
 							"LOCATION 'abfss://nyc-taxi-data@synapsecoursegiannisdl.dfs.core.windows.net/gold';"
 						],
 						"outputs": [],
-						"execution_count": 5
+						"execution_count": 11
 					},
 					{
 						"cell_type": "code",
@@ -2059,7 +2106,7 @@
 							"trip_data_green_df = spark.read.parquet(f\"{silver_folder_path}/trip_data_green\") "
 						],
 						"outputs": [],
-						"execution_count": 4
+						"execution_count": 14
 					},
 					{
 						"cell_type": "code",
@@ -2086,7 +2133,7 @@
 							"                        round(sum(\"fare_amount\"), 2).alias(\"total_fare_amount\"))"
 						],
 						"outputs": [],
-						"execution_count": 5
+						"execution_count": 15
 					},
 					{
 						"cell_type": "code",
@@ -2107,7 +2154,7 @@
 							"trip_data_green_agg_df.write.mode(\"overwrite\").partitionBy(\"year\", \"month\").format(\"parquet\").saveAsTable(\"nyc_taxi_ldw_spark.trip_data_green_agg\")"
 						],
 						"outputs": [],
-						"execution_count": 6
+						"execution_count": 16
 					}
 				]
 			},
