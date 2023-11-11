@@ -14,7 +14,7 @@
 					},
 					"activities": [
 						{
-							"name": "Delete Silver Taxi Zone Folder",
+							"name": "Delete Silver Folder",
 							"type": "Delete",
 							"dependsOn": [],
 							"policy": {
@@ -45,11 +45,11 @@
 							}
 						},
 						{
-							"name": "Create Silver Taxi Zone Table",
+							"name": "Create Silver Table",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Delete Silver Taxi Zone Folder",
+									"activity": "Delete Silver Folder",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -79,14 +79,6 @@
 			}
 		],
 		"variables": {
-			"v_folder_path": {
-				"type": "String",
-				"defaultValue": "silver/taxi_zone"
-			},
-			"v_usp_name": {
-				"type": "String",
-				"defaultValue": "silver.usp_silver_taxi_zone"
-			},
 			"v_filder_path_usp_name_array": {
 				"type": "Array",
 				"defaultValue": [
