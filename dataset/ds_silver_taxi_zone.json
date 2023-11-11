@@ -5,6 +5,9 @@
 			"referenceName": "ls_synapsecoursegiannisdl",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "demo"
+		},
 		"annotations": [],
 		"type": "Parquet",
 		"typeProperties": {
