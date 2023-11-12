@@ -35,15 +35,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('workspaceName'), '/coursepool')]",
-			"type": "Microsoft.Synapse/workspaces/bigDataPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/pl_create_gold_trip_data_green')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -1958,7 +1949,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "80297bac-e10f-4670-96c3-3648cbeede56"
+						"spark.autotune.trackingId": "52ff7943-c508-4211-b3d5-750ae8de9c3a"
 					}
 				},
 				"metadata": {
@@ -1983,8 +1974,7 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -2184,6 +2174,20 @@
 			},
 			"dependsOn": [],
 			"location": "uksouth"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ls_power_bi_synapse_intergration_ws')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "PowerBIWorkspace",
+				"typeProperties": {
+					"workspaceID": "fb9a86a3-241e-4883-acf0-5bef0f91a02b",
+					"tenantID": "8d34f8a5-7afc-42bf-bdfd-d5b734a0aceb"
+				}
+			},
+			"dependsOn": []
 		}
 	]
 }
