@@ -1,0 +1,20 @@
+{
+	"name": "2_trip_data_green_agg_copy",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/dwh"
+		},
+		"content": {
+			"query": "COPY INTO dwh.trip_data_green_agg_copy\nFROM 'https://synapsecoursegiannisdl.dfs.core.windows.net/nyc-taxi-data/gold/trip_data_green_agg'\nWITH\n(\n\tFILE_TYPE = 'PARQUET'\n\t,MAXERRORS = 0\n\t,COMPRESSION = 'snappy'\n\t,AUTO_CREATE_TABLE = 'ON'\n)\n--END\nGO\n\nSELECT TOP 100 * FROM dwh.trip_data_green_agg_copy\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_dwh",
+				"poolName": "nyc_taxi_dwh"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
