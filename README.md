@@ -23,4 +23,4 @@ Finally a couple visualizations are made for a better understanding of the data 
 ![photo4](https://github.com/giannisyp/Azure_Synapse_Taxi_Project/assets/119696474/2598048d-c9d4-4d74-8bd8-5712011aa2cb)
 
 
-Later on the project Azure synapse Link is used to move the data from the sql db to the data warehouse.
+Later on the project Azure Synapse Link is used to move the data from the sql db to the data warehouse.
